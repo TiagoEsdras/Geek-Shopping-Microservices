@@ -50,7 +50,7 @@ public class ProductController : ControllerBase
     public async Task<ActionResult<ProductVO>> Delete(long id)
     {
         var success = await productRepository.Delete(id);
-        if (success) return NoContent();
+        if (success) return Ok(success);
         return BadRequest();
     }
 }

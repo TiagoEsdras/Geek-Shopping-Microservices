@@ -14,11 +14,7 @@ public static class HttpClientExtensions
 
         var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
-        var t = JsonSerializer.Deserialize<T>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                if (t is null)
-            throw new ArgumentNullException();
-
-        return t;
+        return JsonSerializer.Deserialize<T>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
     }
 
     public static Task<HttpResponseMessage> PostAsJson<T>(this HttpClient httpClient, string url, T t)
