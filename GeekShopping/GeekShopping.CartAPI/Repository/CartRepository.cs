@@ -92,12 +92,12 @@ public class CartRepository : ICartRepository
         else
         {
             var cartDetail = await context.CartDetails.AsNoTracking().FirstOrDefaultAsync(cd =>
-                cd.ProductId == cartVO.CartDetails.FirstOrDefault().ProductId &&
+                cd.ProductId == cart.CartDetails.FirstOrDefault().ProductId &&
                 cd.CartHeaderId == cartHeader.Id);
 
             if (cartDetail is null)
             {
-                cart.CartDetails.FirstOrDefault().CartHeaderId = cart.CartHeader.Id;
+                cart.CartDetails.FirstOrDefault().CartHeaderId = cartHeader.Id;
                 cart.CartDetails.FirstOrDefault().Product = null;
                 context.CartDetails.Add(cart.CartDetails.FirstOrDefault());
                 await context.SaveChangesAsync();

@@ -15,36 +15,36 @@ public class ProductService : IProductService
         this.httpClient = httpClient;
     }
 
-    public async Task<IEnumerable<ProductModel>> FindAll(string token)
+    public async Task<IEnumerable<ProductViewModel>> FindAll(string token)
     {
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         var response = await httpClient.GetAsync(basePath);
-        return await response.ReadContentAs<IEnumerable<ProductModel>>();
+        return await response.ReadContentAs<IEnumerable<ProductViewModel>>();
     }
 
-    public async Task<ProductModel> FindById(long id, string token)
+    public async Task<ProductViewModel> FindById(long id, string token)
     {
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         var response = await httpClient.GetAsync($"{basePath}/{id}");
-        return await response.ReadContentAs<ProductModel>();
+        return await response.ReadContentAs<ProductViewModel>();
     }
 
-    public async Task<ProductModel> Create(ProductModel productModel, string token)
+    public async Task<ProductViewModel> Create(ProductViewModel productModel, string token)
     {
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         var response = await httpClient.PostAsJson(basePath, productModel);
         if (!response.IsSuccessStatusCode)
             throw new ApplicationException($"Something went wrong calling the API: {response.ReasonPhrase}");
-        return await response.ReadContentAs<ProductModel>();
+        return await response.ReadContentAs<ProductViewModel>();
     }
 
-    public async Task<ProductModel> Update(ProductModel productModel, string token)
+    public async Task<ProductViewModel> Update(ProductViewModel productModel, string token)
     {
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         var response = await httpClient.PutAsJson(basePath, productModel);
         if (!response.IsSuccessStatusCode)
             throw new ApplicationException($"Something went wrong calling the API: {response.ReasonPhrase}");
-        return await response.ReadContentAs<ProductModel>();
+        return await response.ReadContentAs<ProductViewModel>();
     }
 
     public async Task<bool> DeleteById(long id, string token)
