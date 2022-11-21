@@ -29,7 +29,7 @@ public class CartRepository : ICartRepository
 
     public async Task<CartVO> FindCartByUserId(string userId)
     {
-        var cartHeader = await context.CartHeaders.FirstOrDefaultAsync(c => c.UserId == userId);
+        var cartHeader = await context.CartHeaders.FirstOrDefaultAsync(c => c.UserId == userId) ?? new CartHeader();
         var cartDetails = context.CartDetails
             .Where(c => c.CartHeaderId == cartHeader.Id)
             .Include(c => c.Product);
