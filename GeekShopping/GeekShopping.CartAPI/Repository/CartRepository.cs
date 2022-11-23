@@ -118,11 +118,23 @@ public class CartRepository : ICartRepository
 
     public async Task<bool> ApplyCoupon(string userId, string couponCode)
     {
-        throw new NotImplementedException();
+        var header = await context.CartHeaders.FirstOrDefaultAsync(c => c.UserId == userId);
+        if (header is null) return false;
+
+        header.CouponCode = couponCode;
+        context.CartHeaders.Update(header);
+        await context.SaveChangesAsync();
+        return true;
     }
 
     public async Task<bool> RemoveCoupon(string userId)
     {
-        throw new NotImplementedException();
+        var header = await context.CartHeaders.FirstOrDefaultAsync(c => c.UserId == userId);
+        if (header is null) return false;
+
+        header.CouponCode = "";
+        context.CartHeaders.Update(header);
+        await context.SaveChangesAsync();
+        return true;
     }
 }
