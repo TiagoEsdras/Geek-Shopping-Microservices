@@ -27,6 +27,12 @@ public class CartController : Controller
         return View(await FindUserCart());
     }
 
+    [HttpGet]
+    public async Task<IActionResult> Checkout()
+    {
+        return View(await FindUserCart());
+    }
+
     [HttpPost]
     [ActionName("ApplyCoupon")]
     public async Task<IActionResult> ApplyCoupon(CartViewModel model)
