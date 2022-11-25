@@ -1,5 +1,6 @@
 ﻿using GeekShopping.CartAPI.Data.ValueObjects;
 using GeekShopping.CartAPI.Messages;
+using GeekShopping.CartAPI.RabbitMQSender;
 using GeekShopping.CartAPI.Repository;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,10 +11,12 @@ namespace GeekShopping.CartAPI.Controllers;
 public class CartController : ControllerBase
 {
     private readonly ICartRepository cartRepository;
+    private readonly IRabbitMQMessageSender rabbitMQMessageSender;
 
-    public CartController(ICartRepository cartRepository)
+    public CartController(ICartRepository cartRepository, IRabbitMQMessageSender rabbitMQMessageSender)
     {
         this.cartRepository = cartRepository;
+        this.rabbitMQMessageSender = rabbitMQMessageSender;
     }
 
     [HttpGet("find-cart/{id}")]
@@ -72,6 +75,9 @@ public class CartController : ControllerBase
         if (cart == null) return NotFound();
         vo.CartDetails = cart.CartDetails;
         vo.DateTime = DateTime.Now;
+
+        rabbitMQMessageSender.SendMessage(vo, "checkoutqueue");
+
         return Ok(vo);
     }
 }
