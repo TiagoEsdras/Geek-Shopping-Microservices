@@ -10,12 +10,15 @@ public class CartController : Controller
 {
     private readonly IProductService productService;
     private readonly ICartService cartService;
+    private readonly ICouponService couponService;
 
     public CartController(IProductService productService,
-        ICartService cartService)
+        ICartService cartService,
+        ICouponService couponService)
     {
         this.productService = productService;
         this.cartService = cartService;
+        this.couponService = couponService;
     }
 
     [Authorize]
@@ -76,10 +79,21 @@ public class CartController : Controller
 
         if (response?.CartHeader is not null)
         {
+            if (!string.IsNullOrEmpty(response.CartHeader.CouponCode))
+            {
+                var coupon = await couponService.GetCoupon(response.CartHeader.CouponCode, token);
+
+                if (coupon?.CouponCode is not null)
+                {
+                    response.CartHeader.DiscountAmount = coupon.DiscountAmount;
+                }
+            }
             foreach (var detail in response.CartDetails)
             {
                 response.CartHeader.PurchaseAmount += detail.Product.Price * detail.Count;
             }
+
+            response.CartHeader.PurchaseAmount -= response.CartHeader.DiscountAmount;
         }
         return response;
     }
