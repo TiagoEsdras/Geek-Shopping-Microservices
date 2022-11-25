@@ -13,4 +13,21 @@ public class MySQLContext : DbContext
     }
 
     public DbSet<Coupon> Coupons { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Coupon>().HasData(new Coupon
+        {
+            Id = 1,
+            CouponCode = "COUPON_TESTE_10",
+            DiscountAmount = 10.00m
+        });
+
+        modelBuilder.Entity<Coupon>().HasData(new Coupon
+        {
+            Id = 2,
+            CouponCode = "COUPON_TESTE_20",
+            DiscountAmount = 20.00m
+        });
+    }
 }
