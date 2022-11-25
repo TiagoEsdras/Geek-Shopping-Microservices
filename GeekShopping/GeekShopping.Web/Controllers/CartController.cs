@@ -27,12 +27,6 @@ public class CartController : Controller
         return View(await FindUserCart());
     }
 
-    [HttpGet]
-    public async Task<IActionResult> Checkout()
-    {
-        return View(await FindUserCart());
-    }
-
     [HttpPost]
     [ActionName("ApplyCoupon")]
     public async Task<IActionResult> ApplyCoupon(CartViewModel model)
@@ -73,6 +67,30 @@ public class CartController : Controller
         if (response)
             return RedirectToAction(nameof(CartIndex));
 
+        return View();
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Checkout()
+    {
+        return View(await FindUserCart());
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Checkout(CartViewModel model)
+    {
+        var token = await HttpContext.GetTokenAsync("access_token");
+
+        var response = cartService.Checkout(model.CartHeader, token);
+        if (response is not null)
+            return RedirectToAction(nameof(Confirmation));
+
+        return View(model);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Confirmation()
+    {
         return View();
     }
 
