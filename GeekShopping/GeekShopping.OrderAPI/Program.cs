@@ -1,12 +1,15 @@
 using GeekShopping.OrderAPI.Model.Context;
+using GeekShopping.OrderAPI.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
-
 var connection = builder.Configuration["MySqlConnection:MysqlConnectionString"];
+var dbContext = new DbContextOptionsBuilder<MySQLContext>();
 
+dbContext.UseMySql(connection, new MySqlServerVersion(new Version(8, 0, 31)));
 builder.Services.AddDbContext<MySQLContext>(options => options.UseMySql(connection, new MySqlServerVersion(new Version(8, 0, 31))));
+builder.Services.AddSingleton(new OrderRepository(dbContext.Options));
 builder.Services.AddControllers();
 builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer("Bearer", options =>
@@ -26,7 +29,6 @@ builder.Services.AddAuthorization(options =>
     });
 });
 builder.Services.AddEndpointsApiExplorer();
-//builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 //builder.Services.AddScoped<IRabbitMQMessageSender, RabbitMQMessageSender>();
 builder.Services.AddSwaggerGen(c =>
 {
