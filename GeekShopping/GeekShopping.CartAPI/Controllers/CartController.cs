@@ -12,11 +12,17 @@ public class CartController : ControllerBase
 {
     private readonly ICartRepository cartRepository;
     private readonly IRabbitMQMessageSender rabbitMQMessageSender;
+    private readonly ICouponRepository couponRepository;
 
-    public CartController(ICartRepository cartRepository, IRabbitMQMessageSender rabbitMQMessageSender)
+    public CartController(
+        ICartRepository cartRepository,
+        IRabbitMQMessageSender rabbitMQMessageSender,
+        ICouponRepository couponRepository
+        )
     {
         this.cartRepository = cartRepository;
         this.rabbitMQMessageSender = rabbitMQMessageSender;
+        this.couponRepository = couponRepository;
     }
 
     [HttpGet("find-cart/{id}")]
@@ -70,9 +76,21 @@ public class CartController : ControllerBase
     [HttpPost("checkout")]
     public async Task<ActionResult<CheckoutHeaderVO>> Checkout([FromBody] CheckoutHeaderVO vo)
     {
+        string token = Request.Headers["Authorization"];
         if (vo?.UserId is null) return BadRequest();
         var cart = await cartRepository.FindCartByUserId(vo.UserId);
         if (cart == null) return NotFound();
+
+        if(!string.IsNullOrEmpty(vo.CouponCode))
+        {
+            CouponVO coupon = await couponRepository.GetCouponByCouponCode(vo.CouponCode, token);
+
+            if(vo.DiscountAmount != coupon.DiscountAmount)
+            {
+                return StatusCode(412);
+            }
+        }
+
         vo.CartDetails = cart.CartDetails;
         vo.DateTime = DateTime.Now;
 

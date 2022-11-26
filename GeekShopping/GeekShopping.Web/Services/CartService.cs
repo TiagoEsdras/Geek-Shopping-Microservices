@@ -67,12 +67,14 @@ public class CartService : ICartService
         else throw new Exception("Something went wrong when calling API");
     }
 
-    public async Task<CartHeaderViewModel> Checkout(CartHeaderViewModel model, string token)
+    public async Task<object> Checkout(CartHeaderViewModel model, string token)
     {
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         var response = await httpClient.PostAsJsonAsync($"{BasePath}/checkout", model);
         if (response.IsSuccessStatusCode)
             return await response.ReadContentAs<CartHeaderViewModel>();
+        else if (response.StatusCode.ToString().Equals("PreconditionFailed"))
+            return "Coupon price has changed, please confirm!";
         else throw new Exception("Something went wrong when calling API");
     }
 
