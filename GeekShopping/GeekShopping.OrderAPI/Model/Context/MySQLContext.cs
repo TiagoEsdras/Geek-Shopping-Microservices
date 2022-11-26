@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace GeekShopping.CartAPI.Model.Context;
+namespace GeekShopping.OrderAPI.Model.Context;
 
 public class MySQLContext : DbContext
 {
@@ -12,7 +12,6 @@ public class MySQLContext : DbContext
     {
     }
 
-    public DbSet<Product> Products { get; set; }
-    public DbSet<CartDetail> CartDetails { get; set; }
-    public DbSet<CartHeader> CartHeaders { get; set; }
+    public DbSet<OrderDetail> Details { get; set; }
+    public DbSet<OrderHeader> Headers { get; set; }
 }
