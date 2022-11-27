@@ -12,6 +12,8 @@ namespace GeekShopping.OrderAPI.MessageConsumer
         private readonly OrderRepository orderRepository;
         private readonly IConnection connection;
         private readonly IModel channel;
+        private const string ExchangeName = "FanoutPaymentUpdateExchange";
+        private readonly string queueName;
 
         public RabbitMQPaymentConsumer(OrderRepository orderRepository)
         {
@@ -24,7 +26,9 @@ namespace GeekShopping.OrderAPI.MessageConsumer
             };
             connection = factory.CreateConnection();
             channel = connection.CreateModel();
-            channel.QueueDeclare(queue: "orderpaymentresultqueue", false, false, false, arguments: null);
+            channel.ExchangeDeclare(ExchangeName, ExchangeType.Fanout);
+            queueName = channel.QueueDeclare().QueueName;
+            channel.QueueBind(queueName, ExchangeName, "");
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -38,7 +42,7 @@ namespace GeekShopping.OrderAPI.MessageConsumer
                 UpdatePaymentStatus(vo).GetAwaiter().GetResult();
                 channel.BasicAck(evt.DeliveryTag, false);
             };
-            channel.BasicConsume("orderpaymentresultqueue", false, consumer);
+            channel.BasicConsume(queueName, false, consumer);
             return Task.CompletedTask;
         }
 

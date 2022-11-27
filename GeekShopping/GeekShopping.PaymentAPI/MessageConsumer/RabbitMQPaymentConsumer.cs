@@ -13,7 +13,7 @@ public class RabbitMQPaymentConsumer : BackgroundService
     private readonly IConnection connection;
     private readonly IModel channel;
     private readonly IProcessPayment processPayment;
-    private IRabbitMQMessageSender rabbitMQMessageSender;
+    private readonly IRabbitMQMessageSender rabbitMQMessageSender;
 
     public RabbitMQPaymentConsumer(IProcessPayment processPayment, IRabbitMQMessageSender rabbitMQMessageSender)
     {
@@ -59,7 +59,7 @@ public class RabbitMQPaymentConsumer : BackgroundService
 
         try
         {
-            rabbitMQMessageSender.SendMessage(paymentResult, "orderpaymentresultqueue");
+            rabbitMQMessageSender.SendMessage(paymentResult);
         }
         catch (Exception)
         {
